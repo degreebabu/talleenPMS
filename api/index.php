@@ -2,7 +2,8 @@
 /**
  * Forward Vercel requests to normal index.php
  */
-error_reporting(E_ALL & ~E_DEPRECATED);
+ini_set('display_errors', '1');
+error_reporting(E_ALL);
 
 $appStorage = '/tmp/storage';
 if (!is_dir($appStorage)) {
