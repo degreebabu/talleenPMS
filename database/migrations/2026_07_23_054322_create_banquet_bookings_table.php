@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('banquet_bookings', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('hotel_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('event_space_id')->constrained()->cascadeOnDelete();
+            $table->string('client_name');
+            $table->string('client_email')->nullable();
+            $table->string('client_phone');
+            $table->string('event_type'); // wedding, corporate, party
+            $table->dateTime('start_time');
+            $table->dateTime('end_time');
+            $table->integer('expected_pax');
+            $table->decimal('total_amount', 10, 2)->default(0);
+            $table->decimal('advance_paid', 10, 2)->default(0);
+            $table->string('status')->default('inquiry'); // inquiry, confirmed, completed, cancelled
+            $table->text('notes')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('banquet_bookings');
+    }
+};
