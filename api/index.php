@@ -17,4 +17,10 @@ if (!is_dir($appStorage)) {
 $_ENV['APP_STORAGE'] = $appStorage;
 putenv("APP_STORAGE={$appStorage}");
 
+// Force debug mode and stderr logging for Vercel troubleshooting
+$_ENV['APP_DEBUG'] = 'true';
+putenv('APP_DEBUG=true');
+$_ENV['LOG_CHANNEL'] = 'stderr';
+putenv('LOG_CHANNEL=stderr');
+
 require __DIR__ . '/../public/index.php';
