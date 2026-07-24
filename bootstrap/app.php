@@ -24,5 +24,6 @@ $app = Application::configure(basePath: dirname(__DIR__))
     })->create();
 
 $app->useStoragePath(env('APP_STORAGE', base_path('storage')));
+$app->useBootstrapPath(env('APP_BOOTSTRAP_PATH', base_path('bootstrap')));
 
 return $app;
