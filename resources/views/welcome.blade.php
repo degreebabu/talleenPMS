@@ -68,9 +68,7 @@
 
                 <!-- Nav Links -->
                 <nav class="hidden md:flex items-center gap-8">
-                    <a href="#features" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Features</a>
-                    <a href="#solutions" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Solutions</a>
-                    <a href="#pricing" class="text-sm font-medium text-zinc-400 hover:text-white transition-colors">Pricing</a>
+                    <!-- Menu removed per request -->
                 </nav>
 
                 <!-- Auth Buttons -->
@@ -79,10 +77,7 @@
                         @auth
                             <a href="{{ url('/dashboard') }}" class="text-sm font-medium text-white hover:text-brand-400 transition-colors">Dashboard</a>
                         @else
-                            <a href="{{ route('login') }}" class="text-sm font-medium text-zinc-300 hover:text-white transition-colors">Log in</a>
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="text-sm font-medium bg-white text-zinc-950 px-5 py-2.5 rounded-full hover:bg-zinc-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:scale-105 active:scale-95">Register</a>
-                            @endif
+                            <a href="{{ route('login') }}" class="text-sm font-medium bg-brand-600 text-white px-5 py-2.5 rounded-full hover:bg-brand-500 transition-all shadow-[0_0_20px_rgba(14,165,233,0.3)] hover:scale-105 active:scale-95">Log in</a>
                         @endauth
                     @endif
                 </div>
@@ -108,11 +103,9 @@
             </p>
 
             <div class="flex flex-col sm:flex-row items-center gap-4">
-                @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="w-full sm:w-auto px-8 py-4 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-full shadow-[0_0_30px_rgba(14,165,233,0.3)] transition-all hover:shadow-[0_0_40px_rgba(14,165,233,0.5)] hover:-translate-y-1">
-                        Get Started Free
-                    </a>
-                @endif
+                <a href="{{ route('login') }}" class="w-full sm:w-auto px-8 py-4 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-full shadow-[0_0_30px_rgba(14,165,233,0.3)] transition-all hover:shadow-[0_0_40px_rgba(14,165,233,0.5)] hover:-translate-y-1">
+                    Log in to Portal
+                </a>
                 <a href="#demo" class="w-full sm:w-auto px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-full border border-white/10 backdrop-blur-md transition-all hover:-translate-y-1">
                     Book a Demo
                 </a>
