@@ -4,6 +4,10 @@
             <h2 class="text-2xl font-bold text-slate-900 tracking-wide">Tenant Manager</h2>
             <p class="text-slate-500 mt-1">Manage hotels, their active modules, and platform access.</p>
         </div>
+        <button wire:click="openPropertyModal()" class="font-bold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-xl transition-colors flex items-center gap-2 shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Add New Property
+        </button>
     </div>
 
     @if(session('success'))
@@ -60,6 +64,16 @@
                     @foreach($tenants as $tenant)
                         @include('livewire.super-admin.partials.tenant-row', ['tenant' => $tenant, 'isChild' => false])
                     @endforeach
+                @if($companies->isEmpty() && $tenants->isEmpty())
+                    <tr>
+                        <td colspan="4" class="px-6 py-12 text-center text-slate-500 bg-white">
+                            <div class="flex flex-col items-center justify-center">
+                                <svg class="w-12 h-12 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                <p class="text-base font-medium text-slate-600">No properties exist yet.</p>
+                                <p class="text-sm mt-1">Click the "Add New Property" button to create your first tenant!</p>
+                            </div>
+                        </td>
+                    </tr>
                 @endif
             </tbody>
         </table>
