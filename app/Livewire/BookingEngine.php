@@ -25,6 +25,7 @@ class BookingEngine extends Component
     public $checkOut;
     public $adults = 1;
     public $children = 0;
+    public $rooms = 1;
     public $aiSearchText = '';
     
     // Availability
@@ -33,6 +34,7 @@ class BookingEngine extends Component
 
     // Checkout
     public $selectedCategoryId = null;
+    public $selectedRequiredRooms = 1;
     public $guestName = '';
     public $guestEmail = '';
     public $guestPhone = '';
@@ -62,6 +64,7 @@ class BookingEngine extends Component
             'checkIn' => 'required|date|after_or_equal:today',
             'checkOut' => 'required|date|after:checkIn',
             'adults' => 'required|integer|min:1',
+            'rooms' => 'required|integer|min:1',
         ]);
 
         // Process AI Search text (Simple keyword matching)
@@ -120,9 +123,19 @@ class BookingEngine extends Component
                 })
                 ->count();
 
-            if ($totalRooms - $bookedRooms > 0) {
-                // Check if category can accommodate the requested number of guests
-                if ($cat->max_adults >= $this->adults && $cat->max_children >= $this->children) {
+            $availableCount = $totalRooms - $bookedRooms;
+
+            if ($availableCount > 0) {
+                if ($this->children > 0 && $cat->max_children == 0) {
+                    continue; // Cannot accommodate children at all
+                }
+
+                $adultRooms = ceil($this->adults / max(1, $cat->max_adults));
+                $childRooms = $this->children > 0 ? ceil($this->children / $cat->max_children) : 0;
+                $requiredRooms = (int) max($adultRooms, $childRooms, $this->rooms);
+
+                if ($availableCount >= $requiredRooms) {
+                    $cat->requiredRooms = $requiredRooms;
                     $this->availableCategories[] = $cat;
                 }
             }
@@ -131,9 +144,10 @@ class BookingEngine extends Component
         $this->step = 2;
     }
 
-    public function selectCategory($categoryId)
+    public function selectCategory($categoryId, $requiredRooms)
     {
         $this->selectedCategoryId = $categoryId;
+        $this->selectedRequiredRooms = $requiredRooms;
         $this->step = 3;
     }
 
@@ -154,7 +168,6 @@ class BookingEngine extends Component
 
             $availableRooms = Room::where('hotel_id', $this->hotel->id)
                 ->where('room_category_id', $cat->id)
-                ->where('status', 'available')
                 ->whereDoesntHave('bookingItems', function ($query) use ($in, $out) {
                     $query->where(function($q) use ($in, $out) {
                         $q->where('start_date', '<', $out)
@@ -162,13 +175,11 @@ class BookingEngine extends Component
                     })->whereHas('booking', function($q2) {
                         $q2->whereNotIn('status', ['cancelled']);
                     });
-                })->get();
+                })->take($this->selectedRequiredRooms)->get();
 
-            if ($availableRooms->isEmpty()) {
-                throw new \Exception("Sorry, no rooms are available for these dates.");
+            if ($availableRooms->count() < $this->selectedRequiredRooms) {
+                throw new \Exception("Sorry, not enough rooms are available for these dates.");
             }
-
-            $room = $availableRooms->first();
 
             // Create Guest
             $guest = Guest::firstOrCreate(
@@ -190,20 +201,27 @@ class BookingEngine extends Component
             ]);
 
             $nights = $in->diffInDays($out);
-            $totalAmount = $cat->base_price * $nights;
+            $totalAmount = 0;
 
-            BookingItem::create([
-                'booking_id' => $booking->id,
-                'item_type' => Room::class,
-                'item_id' => $room->id,
-                'start_date' => $in,
-                'end_date' => $out,
-                'price' => $totalAmount,
-            ]);
+            foreach ($availableRooms as $room) {
+                $roomPrice = $cat->base_price * $nights;
+                BookingItem::create([
+                    'booking_id' => $booking->id,
+                    'item_type' => Room::class,
+                    'item_id' => $room->id,
+                    'start_date' => $in,
+                    'end_date' => $out,
+                    'price' => $roomPrice,
+                ]);
+                $totalAmount += $roomPrice;
+            }
 
             $booking->update(['total_amount' => $totalAmount]);
 
             DB::commit();
+
+            // Send Confirmation Email
+            \Illuminate\Support\Facades\Mail::to($guest->email)->send(new \App\Mail\BookingConfirmed($booking));
 
             $this->confirmedBookingNumber = $booking->booking_number;
             $this->step = 4;

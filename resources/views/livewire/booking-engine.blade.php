@@ -61,7 +61,11 @@
                             <input wire:model="checkOut" type="date" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 font-semibold focus:ring-2 focus:ring-brand-primary">
                             @error('checkOut') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Rooms</label>
+                                <input wire:model="rooms" type="number" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 font-semibold focus:ring-2 focus:ring-brand-primary">
+                            </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Adults</label>
                                 <input wire:model="adults" type="number" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 font-semibold focus:ring-2 focus:ring-brand-primary">
@@ -136,7 +140,10 @@
                                     </div>
                                     <div class="text-right">
                                         <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Per Night</div>
-                                        <div class="text-3xl font-black text-brand-primary">₹{{ number_format($cat->base_price, 0) }}</div>
+                                        <div class="text-3xl font-black text-brand-primary">₹{{ number_format($cat->base_price * ($cat->requiredRooms ?? 1), 0) }}</div>
+                                        @if(($cat->requiredRooms ?? 1) > 1)
+                                            <div class="text-[10px] font-bold text-rose-500 uppercase tracking-wider mt-1">Requires {{ $cat->requiredRooms }} Rooms</div>
+                                        @endif
                                     </div>
                                 </div>
                                 <p class="text-sm text-slate-600 mt-4 leading-relaxed">{{ $cat->description }}</p>
@@ -147,7 +154,7 @@
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     Available
                                 </div>
-                                <button wire:click="selectCategory({{ $cat->id }})" class="px-6 py-2.5 bg-brand-primary hover:opacity-90 text-white font-bold rounded-xl transition shadow-sm">
+                                <button wire:click="selectCategory({{ $cat->id }}, {{ $cat->requiredRooms ?? 1 }})" class="px-6 py-2.5 bg-brand-primary hover:opacity-90 text-white font-bold rounded-xl transition shadow-sm">
                                     Select Room
                                 </button>
                             </div>
@@ -210,7 +217,7 @@
                     @php
                         $cat = \App\Models\RoomCategory::find($this->selectedCategoryId);
                         $nights = \Carbon\Carbon::parse($checkIn)->diffInDays(\Carbon\Carbon::parse($checkOut));
-                        $total = $cat ? $cat->base_price * $nights : 0;
+                        $total = $cat ? $cat->base_price * $nights * $this->selectedRequiredRooms : 0;
                     @endphp
                     <div class="bg-slate-900 rounded-3xl p-8 text-white shadow-xl sticky top-24">
                         <h3 class="text-lg font-bold text-white mb-6">Booking Summary</h3>
@@ -218,7 +225,7 @@
                         <div class="space-y-4 mb-6 pb-6 border-b border-slate-700/50">
                             <div>
                                 <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Room</div>
-                                <div class="font-bold">{{ $cat->name ?? '' }}</div>
+                                <div class="font-bold">{{ $this->selectedRequiredRooms }}x {{ $cat->name ?? '' }}</div>
                             </div>
                             <div class="flex justify-between">
                                 <div>
@@ -237,7 +244,7 @@
                         </div>
 
                         <div class="flex items-center justify-between mb-2">
-                            <div class="text-slate-400">₹{{ number_format($cat->base_price ?? 0, 0) }} x {{ $nights }} nights</div>
+                            <div class="text-slate-400">₹{{ number_format($cat->base_price ?? 0, 0) }} x {{ $nights }} nights x {{ $this->selectedRequiredRooms }}</div>
                             <div class="font-bold text-white">₹{{ number_format($total, 0) }}</div>
                         </div>
                         <div class="flex items-center justify-between mb-6">

@@ -13,6 +13,9 @@ Route::get('/book/{hotel:subdomain}', function (\App\Models\Hotel $hotel) {
     return view('public.book', compact('hotel'));
 })->name('public.book');
 
+Route::get('/booking/cancel/{booking_number}', [\App\Http\Controllers\BookingCancellationController::class, 'cancel'])
+    ->name('booking.cancel')->middleware('signed');
+
 // ── Auth routes (Breeze) ────────────────────────────────────────────────────
 require __DIR__.'/auth.php';
 
