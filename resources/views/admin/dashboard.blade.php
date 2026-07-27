@@ -162,5 +162,33 @@
                 </div>
             </a>
         </div>
+        
+        {{-- Booking Engine Integration --}}
+        @if(auth()->user()->hotel)
+        <div class="mt-8 bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                        Website Booking Engine
+                    </h3>
+                    <p class="text-sm text-slate-500 mt-1">Embed the direct booking widget on your own hotel website.</p>
+                </div>
+                <a href="{{ route('book', auth()->user()->hotel->subdomain) }}" target="_blank" class="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg text-sm hover:bg-blue-700 transition flex items-center gap-2 shadow-sm">
+                    Open Booking Page
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </a>
+            </div>
+            <div class="p-6">
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Embed Code (Copy & Paste into your website HTML)</label>
+                <div class="relative">
+                    <textarea readonly class="w-full bg-slate-900 text-emerald-400 font-mono text-sm p-4 rounded-xl border border-slate-700 focus:ring-0 focus:border-slate-700 h-32 resize-none" onclick="this.select()">
+<!-- Talleen PMS Booking Widget -->
+<iframe src="{{ route('book', auth()->user()->hotel->subdomain) }}" width="100%" height="800px" frameborder="0" style="border:none; border-radius:12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);"></iframe>
+<script>window.addEventListener("message",(e)=>{if(e.data.type==="talleen-resize"){document.querySelector("iframe[src*='talleen']").style.height=e.data.height+"px"}});</script></textarea>
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
 </x-admin-layout>
