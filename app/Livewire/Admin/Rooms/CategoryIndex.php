@@ -93,7 +93,13 @@ class CategoryIndex extends Component
         }
 
         foreach ($this->newImages as $image) {
-            $path = $image->store("hotels/{$cat->hotel_id}/categories/{$cat->id}", 'public');
+            if (env('CLOUDINARY_URL')) {
+                $path = cloudinary()->upload($image->getRealPath(), [
+                    'folder' => "hotels/{$cat->hotel_id}/categories/{$cat->id}"
+                ])->getSecurePath();
+            } else {
+                $path = $image->store("hotels/{$cat->hotel_id}/categories/{$cat->id}", 'public');
+            }
             $cat->images()->create(['image_path' => $path]);
         }
 
