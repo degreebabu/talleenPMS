@@ -36,4 +36,9 @@ class RoomCategory extends Model
     {
         return $this->hasMany(Room::class);
     }
+
+    public function getCapacityAttribute()
+    {
+        return $this->max_adults + $this->max_children;
+    }
 }

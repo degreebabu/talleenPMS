@@ -101,10 +101,9 @@ class BookingEngine extends Component
         $this->availableCategories = [];
 
         foreach ($categories as $cat) {
-            // Count total rooms in category
+            // Count total rooms in category (ignore current status, as it might be occupied today but available next week)
             $totalRooms = Room::where('hotel_id', $this->hotel->id)
                 ->where('room_category_id', $cat->id)
-                ->where('status', 'available') // Not out of order
                 ->count();
 
             // Count booked rooms in that category overlapping dates
@@ -122,8 +121,8 @@ class BookingEngine extends Component
                 ->count();
 
             if ($totalRooms - $bookedRooms > 0) {
-                // Determine if it matches guest count (simple capacity check)
-                if ($cat->capacity >= ($this->adults + $this->children)) {
+                // Check if category can accommodate the requested number of guests
+                if ($cat->max_adults >= $this->adults && $cat->max_children >= $this->children) {
                     $this->availableCategories[] = $cat;
                 }
             }
