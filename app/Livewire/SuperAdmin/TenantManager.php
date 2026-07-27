@@ -23,6 +23,13 @@ class TenantManager extends Component
     public $propGst;
     public $propRegistration;
     
+    // Admin Creation
+    public $showAdminModal = false;
+    public $adminHotelId = null;
+    public $adminName;
+    public $adminEmail;
+    public $adminPassword;
+    
     // Core Modules schema (shared with ModuleManager)
     public function getCoreModules()
     {
@@ -144,6 +151,37 @@ class TenantManager extends Component
         
         $this->selectedTenant->features = $features;
         $this->selectedTenant->save();
+    }
+
+    public function openAdminModal($hotelId)
+    {
+        $this->resetValidation();
+        $this->reset(['adminName', 'adminEmail', 'adminPassword']);
+        $this->adminHotelId = $hotelId;
+        $this->showAdminModal = true;
+    }
+
+    public function createAdmin()
+    {
+        $this->validate([
+            'adminName' => 'required|string|max:255',
+            'adminEmail' => 'required|email|unique:users,email',
+            'adminPassword' => 'required|min:8',
+        ]);
+
+        $hotel = Hotel::findOrFail($this->adminHotelId);
+
+        $user = \App\Models\User::create([
+            'name' => $this->adminName,
+            'email' => $this->adminEmail,
+            'password' => \Illuminate\Support\Facades\Hash::make($this->adminPassword),
+            'hotel_id' => $hotel->id,
+        ]);
+
+        $user->assignRole('hotel_admin');
+
+        $this->showAdminModal = false;
+        session()->flash('success', 'Admin user created successfully. You can now impersonate this property.');
     }
 
     public function render()
