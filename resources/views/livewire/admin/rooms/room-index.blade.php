@@ -46,7 +46,7 @@
                         <option value="maintenance" @selected($room->status === 'maintenance')>Maintenance</option>
                     </select>
                 </td>
-                <td class="px-5 py-3.5 text-right">
+                    <button wire:click="openBlockModal({{ $room->id }})" class="text-xs text-slate-500 hover:text-rose-600 bg-slate-100 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition mr-1">Block Dates</button>
                     <button wire:click="openEdit({{ $room->id }})" class="text-xs text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition mr-1">Edit</button>
                 </td>
             </tr>
@@ -113,6 +113,52 @@
             <button wire:click="save" wire:loading.attr="disabled" class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition disabled:opacity-50">
                 <span wire:loading.remove>Save Room</span>
                 <span wire:loading>Saving...</span>
+            </button>
+        </div>
+    </div>
+</div>
+@endif
+
+{{-- Block Dates Modal --}}
+@if($showBlockModal)
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm" wire:click.self="$set('showBlockModal', false)">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md shadow-2xl">
+        <div class="flex items-center justify-between p-6 border-b border-slate-200">
+            <h3 class="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                Block Calendar Dates
+            </h3>
+            <button wire:click="$set('showBlockModal', false)" class="text-slate-500 hover:text-slate-900"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        </div>
+
+        <div class="p-6 space-y-4">
+            <p class="text-sm text-slate-500 mb-4">Select dates to make this room unavailable for booking.</p>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">Start Date *</label>
+                    <input wire:model="blockStartDate" type="date" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-500">
+                    @error('blockStartDate') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1.5">End Date *</label>
+                    <input wire:model="blockEndDate" type="date" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-500">
+                    @error('blockEndDate') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-600 mb-1.5">Reason for Block *</label>
+                <input wire:model="blockReason" type="text" placeholder="e.g. Renovation, Plumbing issue" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-500">
+                @error('blockReason') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+        </div>
+
+        <div class="flex gap-3 p-6 pt-0">
+            <button wire:click="$set('showBlockModal', false)" class="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-medium rounded-xl transition">Cancel</button>
+            <button wire:click="saveBlock" wire:loading.attr="disabled" class="flex-1 px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold rounded-xl transition disabled:opacity-50 flex items-center justify-center">
+                <span wire:loading.remove>Block Dates</span>
+                <span wire:loading>Processing...</span>
             </button>
         </div>
     </div>
