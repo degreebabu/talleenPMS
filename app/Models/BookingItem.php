@@ -8,7 +8,6 @@ use \App\Traits\BelongsToTenant;
 
 class BookingItem extends Model
 {
-    use BelongsToTenant;
     protected $guarded = [];
 
     protected $casts = [
