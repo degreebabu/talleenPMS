@@ -251,4 +251,47 @@
         </div>
     </div>
     @endif
+
+    <!-- Add Admin Modal -->
+    @if($showAdminModal)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl transform transition-all">
+            <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                <h3 class="text-xl font-bold text-slate-900">Create Tenant Admin</h3>
+                <button wire:click="$set('showAdminModal', false)" class="text-slate-400 hover:text-slate-600 transition bg-white rounded-full p-2 border border-slate-200 shadow-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Admin Name</label>
+                    <input wire:model="adminName" type="text" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="e.g. John Doe">
+                    @error('adminName') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Admin Email</label>
+                    <input wire:model="adminEmail" type="email" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="admin@resort.com">
+                    @error('adminEmail') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Password</label>
+                    <input wire:model="adminPassword" type="password" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="At least 8 characters">
+                    @error('adminPassword') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                </div>
+            </div>
+            
+            <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-3 bg-slate-50">
+                <button wire:click="$set('showAdminModal', false)" class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:text-slate-900 bg-white border border-slate-300 rounded-xl transition shadow-sm">
+                    Cancel
+                </button>
+                <button wire:click="createAdmin" class="px-5 py-2.5 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-sm flex items-center gap-2">
+                    Create User & Grant Access
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>
