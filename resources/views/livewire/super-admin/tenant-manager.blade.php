@@ -64,6 +64,8 @@
                     @foreach($tenants as $tenant)
                         @include('livewire.super-admin.partials.tenant-row', ['tenant' => $tenant, 'isChild' => false])
                     @endforeach
+                @endif
+                
                 @if($companies->isEmpty() && $tenants->isEmpty())
                     <tr>
                         <td colspan="4" class="px-6 py-12 text-center text-slate-500 bg-white">
