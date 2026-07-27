@@ -44,15 +44,15 @@
             })->exists();
         @endphp
 
-        @if($hasAdmin)
-            <a href="{{ route('super-admin.impersonate', $tenant->id) }}" class="text-slate-500 hover:text-slate-700 font-semibold transition text-xs bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
-                Impersonate
-            </a>
-        @else
+        @if(!$hasAdmin)
             <button wire:click="openAdminModal({{ $tenant->id }})" class="text-emerald-600 hover:text-emerald-700 font-semibold transition text-xs bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">
                 Create Admin
             </button>
         @endif
+        
+        <a href="{{ route('super-admin.impersonate', $tenant->id) }}" class="text-slate-500 hover:text-slate-700 font-semibold transition text-xs bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+            Impersonate
+        </a>
         <button wire:click="manageModules({{ $tenant->id }})" class="text-blue-600 hover:text-blue-700 font-semibold transition text-xs bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">
             Manage Access
         </button>
