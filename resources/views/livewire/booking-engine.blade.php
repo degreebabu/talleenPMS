@@ -360,6 +360,7 @@
         </button>
     </div>
 
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         document.addEventListener('livewire:initialized', () => {
             Livewire.hook('morph.updated', ({ el, component }) => {
@@ -367,6 +368,36 @@
                 if (container) {
                     container.scrollTop = container.scrollHeight;
                 }
+            });
+
+            @this.on('open-razorpay', (options) => {
+                options = options[0];
+                var rzpOptions = {
+                    "key": options.key,
+                    "amount": options.amount,
+                    "currency": "INR",
+                    "name": options.name,
+                    "description": options.description,
+                    "image": options.image,
+                    "order_id": options.order_id,
+                    "prefill": options.prefill,
+                    "theme": {
+                        "color": "{{ $hotel->primary_color ?? '#1d4ed8' }}"
+                    },
+                    "handler": function (response){
+                        @this.verifyPayment(
+                            response.razorpay_payment_id,
+                            response.razorpay_order_id,
+                            response.razorpay_signature,
+                            options.booking_id
+                        );
+                    }
+                };
+                var rzp1 = new Razorpay(rzpOptions);
+                rzp1.on('payment.failed', function (response){
+                    alert("Payment failed: " + response.error.description);
+                });
+                rzp1.open();
             });
         });
     </script>

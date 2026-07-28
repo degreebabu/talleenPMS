@@ -129,4 +129,29 @@
             </section>
         </div>
     </div>
+
+    {{-- Payment Gateway Configuration --}}
+    <div class="mt-6 bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h2 class="text-lg font-bold text-slate-900">Payment Gateway</h2>
+            <div class="flex items-center gap-2 text-xs font-semibold px-2 py-1 bg-green-50 text-green-600 rounded">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Razorpay Supported
+            </div>
+        </div>
+        <div class="p-6">
+            <p class="text-sm text-slate-500 mb-6">Enter your Razorpay API Key and Secret to enable online payments during checkout. If left blank, guests will only be able to Pay at Hotel.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Razorpay Key ID</label>
+                    <input wire:model="razorpay_key" type="text" placeholder="rzp_live_..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Razorpay Key Secret</label>
+                    <input wire:model="razorpay_secret" type="password" placeholder="••••••••••••••••••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

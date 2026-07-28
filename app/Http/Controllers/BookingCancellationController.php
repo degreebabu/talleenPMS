@@ -24,10 +24,10 @@ class BookingCancellationController extends Controller
 
         $booking->update(['status' => 'cancelled']);
 
-        // Fetch Tenant Admins and Front Office users for this hotel
+        // Fetch Hotel Admins and Front Desk users for this hotel
         $admins = User::where('hotel_id', $booking->hotel_id)
             ->whereHas('roles', function($q) {
-                $q->whereIn('name', ['tenant_admin', 'front_office']);
+                $q->whereIn('name', ['hotel_admin', 'front_desk']);
             })->get();
 
         Notification::send($admins, new BookingCancelledNotification($booking));

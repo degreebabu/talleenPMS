@@ -12,6 +12,7 @@ use Livewire\Component;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Razorpay\Api\Api;
 
 class BookingEngine extends Component
 {
@@ -159,6 +160,11 @@ class BookingEngine extends Component
             'guestPhone' => 'required|string|max:20',
         ]);
 
+        // Prevent double submissions
+        if ($this->hotel->razorpay_key && $this->hotel->razorpay_secret && request()->has('razorpay_payment_id')) {
+            return;
+        }
+
         DB::beginTransaction();
         try {
             // Re-verify availability
@@ -217,10 +223,47 @@ class BookingEngine extends Component
             }
 
             $booking->update(['total_amount' => $totalAmount]);
-
+            
             DB::commit();
 
-            // Send Confirmation Email
+            if ($this->hotel->razorpay_key && $this->hotel->razorpay_secret) {
+                // Initialize Razorpay
+                $api = new Api($this->hotel->razorpay_key, $this->hotel->razorpay_secret);
+                
+                // Create Razorpay Order
+                $orderData = [
+                    'receipt'         => $booking->booking_number,
+                    'amount'          => $totalAmount * 100, // amount in paise
+                    'currency'        => 'INR',
+                    'payment_capture' => 1 // auto capture
+                ];
+                $razorpayOrder = $api->order->create($orderData);
+                
+                $booking->update([
+                    'status' => 'pending_payment',
+                    'razorpay_order_id' => $razorpayOrder['id']
+                ]);
+
+                // Dispatch event to Alpine/JS to open Razorpay UI
+                $this->dispatch('open-razorpay', [
+                    'key' => $this->hotel->razorpay_key,
+                    'amount' => $totalAmount * 100,
+                    'name' => $this->hotel->name,
+                    'description' => 'Hotel Booking',
+                    'image' => $this->hotel->logo_path ? \Illuminate\Support\Facades\Storage::url($this->hotel->logo_path) : null,
+                    'order_id' => $razorpayOrder['id'],
+                    'prefill' => [
+                        'name' => $guest->name,
+                        'email' => $guest->email,
+                        'contact' => $guest->phone
+                    ],
+                    'booking_id' => $booking->id
+                ]);
+                
+                return; // Stop here, wait for verifyPayment
+            }
+
+            // If no Razorpay, standard confirmed booking
             \Illuminate\Support\Facades\Mail::to($guest->email)->send(new \App\Mail\BookingConfirmed($booking));
 
             $this->confirmedBookingNumber = $booking->booking_number;
@@ -229,6 +272,35 @@ class BookingEngine extends Component
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', $e->getMessage());
+        }
+    }
+
+    public function verifyPayment($razorpay_payment_id, $razorpay_order_id, $razorpay_signature, $booking_id)
+    {
+        try {
+            $api = new Api($this->hotel->razorpay_key, $this->hotel->razorpay_secret);
+            $attributes = array(
+                'razorpay_order_id' => $razorpay_order_id,
+                'razorpay_payment_id' => $razorpay_payment_id,
+                'razorpay_signature' => $razorpay_signature
+            );
+
+            $api->utility->verifyPaymentSignature($attributes);
+            
+            $booking = Booking::findOrFail($booking_id);
+            $booking->update([
+                'status' => 'confirmed',
+                'amount_paid' => $booking->total_amount,
+                'razorpay_payment_id' => $razorpay_payment_id
+            ]);
+            
+            \Illuminate\Support\Facades\Mail::to($booking->guest->email)->send(new \App\Mail\BookingConfirmed($booking));
+
+            $this->confirmedBookingNumber = $booking->booking_number;
+            $this->step = 4;
+
+        } catch (\Exception $e) {
+            session()->flash('error', 'Payment verification failed: ' . $e->getMessage());
         }
     }
 

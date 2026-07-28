@@ -13,6 +13,7 @@ class HotelSettings extends Component
     public $name, $address, $contact_email, $contact_phone, $gst_number, $registration_number;
     public $primary_color, $secondary_color;
     public $check_in_time, $check_out_time;
+    public $razorpay_key, $razorpay_secret;
     public $logo, $cover;
     public $document_files = [];
     
@@ -31,6 +32,8 @@ class HotelSettings extends Component
         $this->secondary_color = $hotel->secondary_color ?? '#f1f5f9';
         $this->check_in_time = $hotel->check_in_time ? date('H:i', strtotime($hotel->check_in_time)) : '14:00';
         $this->check_out_time = $hotel->check_out_time ? date('H:i', strtotime($hotel->check_out_time)) : '11:00';
+        $this->razorpay_key = $hotel->razorpay_key;
+        $this->razorpay_secret = $hotel->razorpay_secret;
         $this->current_logo = $hotel->logo_path;
         $this->current_cover = $hotel->cover_path;
         $this->current_documents = $hotel->documents ?? [];
@@ -83,6 +86,8 @@ class HotelSettings extends Component
             'secondary_color' => $this->secondary_color,
             'check_in_time' => $this->check_in_time,
             'check_out_time' => $this->check_out_time,
+            'razorpay_key' => $this->razorpay_key,
+            'razorpay_secret' => $this->razorpay_secret,
         ]);
 
         session()->flash('success', 'Settings updated successfully.');
