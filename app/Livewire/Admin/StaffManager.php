@@ -21,7 +21,7 @@ class StaffManager extends Component
     public $name = '';
     public $email = '';
     public $password = '';
-    public $role = 'restaurant_manager';
+    public $role = 'front_desk';
     public $phone = '';
     public $id_card_number = '';
     public $govt_id; // For file upload
@@ -32,11 +32,17 @@ class StaffManager extends Component
     public function mount()
     {
         // Ensure standard roles exist globally
-        if (!Role::where('name', 'restaurant_manager')->exists()) {
-            Role::create(['name' => 'restaurant_manager', 'guard_name' => 'web']);
+        if (!Role::where('name', 'hotel_admin')->exists()) {
+            Role::create(['name' => 'hotel_admin', 'guard_name' => 'web']);
         }
-        if (!Role::where('name', 'receptionist')->exists()) {
-            Role::create(['name' => 'receptionist', 'guard_name' => 'web']);
+        if (!Role::where('name', 'front_desk')->exists()) {
+            Role::create(['name' => 'front_desk', 'guard_name' => 'web']);
+        }
+        if (!Role::where('name', 'housekeeping')->exists()) {
+            Role::create(['name' => 'housekeeping', 'guard_name' => 'web']);
+        }
+        if (!Role::where('name', 'accountant')->exists()) {
+            Role::create(['name' => 'accountant', 'guard_name' => 'web']);
         }
 
         $this->loadRoles();
@@ -59,7 +65,7 @@ class StaffManager extends Component
     public function create()
     {
         $this->reset(['name', 'email', 'password', 'phone', 'id_card_number', 'govt_id']);
-        $this->role = 'restaurant_manager';
+        $this->role = 'front_desk';
         $this->showForm = true;
         $this->showRoleForm = false;
     }
